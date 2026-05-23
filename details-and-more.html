@@ -178,10 +178,38 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
-body{background:var(--dark);color:var(--text);font-family:var(--b);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+body{background:var(--dark);color:var(--text);font-family:var(--b);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;padding-bottom:72px}
+@media(min-width:768px){body{padding-bottom:0}}
 img{max-width:100%;display:block}
 a{color:inherit;text-decoration:none}
 button{font-family:inherit}
+
+/* ─── NAV ─── */
+nav.top{position:sticky;top:0;z-index:200;background:rgba(8,18,29,.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border-vis);padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:56px}
+@media(min-width:768px){nav.top{padding:0 32px;height:60px}}
+.nav-logo{font-family:var(--h);font-weight:800;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:var(--text);display:flex;align-items:center;gap:10px}
+.nav-logo span{color:var(--teal)}
+.nav-logo img{height:36px;width:auto}
+@media(min-width:768px){.nav-logo{font-size:14px}}
+.nav-right{display:flex;align-items:center;gap:12px}
+.nav-phone{display:none;font-weight:600;font-size:13px;color:var(--teal);font-family:var(--h);letter-spacing:.04em}
+@media(min-width:768px){.nav-phone{display:inline}}
+.nav-menu-btn{background:none;border:1px solid var(--border-vis);color:var(--text);width:38px;height:38px;font-size:18px;cursor:pointer;line-height:1;display:flex;align-items:center;justify-content:center}
+@media(min-width:900px){.nav-menu-btn{display:none}}
+.nav-links{display:none;align-items:center;gap:24px;font-size:12px;color:var(--sub);text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+@media(min-width:900px){.nav-links{display:flex}}
+.nav-links a:hover{color:var(--teal)}
+.nav-cta{display:none;background:var(--teal);color:#08121d;font-family:var(--b);font-weight:700;font-size:11px;letter-spacing:.1em;text-transform:uppercase;padding:9px 16px;transition:background .2s}
+.nav-cta:hover{background:var(--teal-dim)}
+@media(min-width:900px){.nav-cta{display:inline-block}}
+
+/* mobile menu */
+.mobile-menu{position:fixed;inset:56px 0 0 0;z-index:190;background:var(--dark);padding:8px 20px 28px;transform:translateX(100%);transition:transform .25s;display:flex;flex-direction:column;overflow-y:auto}
+.mobile-menu.open{transform:translateX(0)}
+.mobile-menu a{padding:18px 4px;border-bottom:1px solid var(--border-vis);font-family:var(--h);font-size:14px;text-transform:uppercase;letter-spacing:.08em;font-weight:700}
+.mobile-menu a:hover{color:var(--teal)}
+.mobile-menu .mm-cta{background:var(--teal);color:#08121d;text-align:center;margin-top:20px;border:none}
+@media(min-width:900px){.mobile-menu{display:none}}
 
 /* ─── HERO ─── */
 .hero{position:relative;padding:48px 20px 56px;border-bottom:2px solid var(--teal);overflow:hidden}
@@ -327,6 +355,26 @@ section{padding:48px 16px}
 .bigcta p{font-size:16px;color:var(--sub);margin-bottom:32px;line-height:1.65;max-width:520px;margin-left:auto;margin-right:auto}
 .bigcta .hero-ctas{margin:0 auto;justify-content:center;max-width:460px}
 
+/* ─── FOOTER ─── */
+footer{background:var(--dark-2);border-top:1px solid var(--border-vis);padding:40px 20px 28px}
+.footer-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:32px;text-align:center}
+@media(min-width:768px){.footer-inner{grid-template-columns:1fr 1fr 1fr;text-align:left;gap:40px}}
+.footer-brand{display:flex;flex-direction:column;align-items:center;gap:14px}
+@media(min-width:768px){.footer-brand{align-items:flex-start}}
+.footer-logo{font-family:var(--h);font-weight:800;font-size:14px;letter-spacing:.04em;text-transform:uppercase}
+.footer-logo span{color:var(--teal)}
+.footer-addr{font-size:13px;color:var(--sub);line-height:1.7}
+.footer-col h4{font-family:var(--h);font-weight:700;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--teal);margin-bottom:14px}
+.footer-col a{display:block;font-size:13px;color:var(--sub);padding:4px 0;transition:color .2s}
+.footer-col a:hover{color:var(--teal)}
+.footer-bottom{text-align:center;padding-top:20px;border-top:1px solid var(--border-vis);margin-top:8px;font-size:12px;color:var(--muted)}
+
+/* ─── MOBILE CTA BAR ─── */
+.mob-cta{position:fixed;bottom:0;left:0;right:0;z-index:150;background:rgba(8,18,29,.97);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-top:1px solid var(--border-vis);display:grid;grid-template-columns:1fr 1.2fr;gap:1px;background-color:var(--border-vis);padding-bottom:env(safe-area-inset-bottom)}
+@media(min-width:768px){.mob-cta{display:none}}
+.mob-cta a{background:var(--dark);padding:12px 8px;text-align:center;font-family:var(--h);font-weight:700;font-size:11px;letter-spacing:.06em;text-transform:uppercase;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:var(--text);line-height:1.2;min-height:60px}
+.mob-cta a.primary{background:var(--teal);color:#08121d}
+.mob-cta-sub{font-size:9px;font-weight:500;opacity:.7;letter-spacing:.04em;text-transform:none;margin-top:1px}
 
 /* ─── ANIMATIONS ─── */
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
@@ -335,6 +383,37 @@ section{padding:48px 16px}
 </style>
 </head>
 <body>
+
+<!-- NAV -->
+<nav class="top">
+  <a href="https://www.stormsafesteel.com" class="nav-logo">
+    <img src="https://static.wixstatic.com/media/f8c53c_fdc0ddeea3e34ff782f44a95fb9e7b03~mv2.png/v1/fill/w_65,h_62,al_c,q_85,usm_0.66_1.00_0.01,enc_avif,quality_auto/f8c53c_fdc0ddeea3e34ff782f44a95fb9e7b03~mv2.png" alt="StormSafe Steel" width="36" height="34">
+    Storm<span>Safe</span> Steel
+  </a>
+  <div class="nav-links">
+    <a href="https://www.stormsafesteel.com">Home</a>
+    <a href="https://www.stormsafesteel.com/buildings">Buildings</a>
+    <a href="https://www.stormsafesteel.com/customize">Customize</a>
+    <a href="https://www.stormsafesteel.com/why-steel">Why Steel</a>
+    <a href="https://www.stormsafesteel.com/about-us">About</a>
+    <a href="https://www.stormsafesteel.com/blog">Blog</a>
+    <a href="https://www.stormsafesteel.com/contact">Contact</a>
+  </div>
+  <div class="nav-right">
+    <a href="tel:5617715555" class="nav-phone">561-771-5555</a>
+    <a href="https://www.stormsafesteel.com/contact" class="nav-cta">Free Quote</a>
+    <button class="nav-menu-btn" onclick="document.querySelector('.mobile-menu').classList.toggle('open')" aria-label="Menu">☰</button>
+  </div>
+</nav>
+<div class="mobile-menu">
+  <a href="https://www.stormsafesteel.com">Home</a>
+  <a href="https://www.stormsafesteel.com/buildings">Buildings</a>
+  <a href="https://www.stormsafesteel.com/customize">Customize</a>
+  <a href="https://www.stormsafesteel.com/why-steel">Why Steel</a>
+  <a href="https://www.stormsafesteel.com/about-us">About</a>
+  <a href="https://www.stormsafesteel.com/blog">Blog</a>
+  <a href="https://www.stormsafesteel.com/contact" class="mm-cta">Get a Free Quote</a>
+</div>
 
 <!-- HERO -->
 <section class="hero">
@@ -707,6 +786,45 @@ section{padding:48px 16px}
     </div>
   </div>
 </section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <div class="footer-logo">Storm<span>Safe</span> Steel</div>
+      <div class="footer-addr">8480 Okeechobee Blvd, Suite 5<br>West Palm Beach, FL 33411</div>
+    </div>
+    <div class="footer-col">
+      <h4>Buildings</h4>
+      <a href="https://www.stormsafesteel.com/residential-garages">Residential Garages</a>
+      <a href="https://www.stormsafesteel.com/hurricane-rated-steel-buildings">Hurricane Rated</a>
+      <a href="https://www.stormsafesteel.com/custom-steel-buildings">Custom Buildings</a>
+      <a href="https://www.stormsafesteel.com/clear-span-steel-buildings">Clear Span</a>
+      <a href="https://www.stormsafesteel.com/metal-building-kit">Metal Building Kits</a>
+    </div>
+    <div class="footer-col">
+      <h4>Company</h4>
+      <a href="https://www.stormsafesteel.com/about-us">About Us</a>
+      <a href="https://www.stormsafesteel.com/contact">Contact</a>
+      <a href="https://www.stormsafesteel.com/blog">Blog</a>
+      <a href="https://www.stormsafesteel.com/terms-of-use">Terms of Use</a>
+      <a href="https://www.stormsafesteel.com/privacy-policy">Privacy Policy</a>
+    </div>
+  </div>
+  <div class="footer-bottom">© 2026 StormSafe Steel Buildings. All rights reserved.</div>
+</footer>
+
+<!-- MOBILE CTA BAR -->
+<div class="mob-cta">
+  <a href="tel:5617715555">
+    Call Us
+    <span class="mob-cta-sub">561-771-5555</span>
+  </a>
+  <a href="https://www.stormsafesteel.com/contact" class="primary">
+    Free Quote
+    <span class="mob-cta-sub">Design your garage</span>
+  </a>
+</div>
 
 </body>
 </html>
