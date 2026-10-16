@@ -176,7 +176,8 @@ body:not(:has(nav.top)) .cz{height:100vh;min-height:0}
 .cz-fitwin{position:absolute;inset:0;z-index:25;display:grid;grid-template-rows:auto minmax(0,1fr);background:var(--dark)}
 .cz-fithead{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:10px 18px;background:var(--dark-2);border-bottom:1px solid var(--border-vis)}
 .cz-fithead b{font:800 14px/1.2 var(--h);text-transform:uppercase;letter-spacing:.04em}.cz-fithead small{color:var(--sub);font-size:12.5px}
-.cz-fithead .btn{min-height:42px}
+.cz-fithead .btn{min-height:42px;flex:none}
+.cz-reach{margin:-4px 0 0;font-size:12.5px;color:var(--sub)}
 #czFitFrame{width:100%;height:100%;border:0;background:var(--dark)}
 .cz-submit{grid-column:1/-1;width:100%}
 .cz-done{text-align:center;padding:10px 4px}.cz-done:focus{outline:none}.cz-done .big{font:900 22px/1.15 var(--h);text-transform:uppercase;color:var(--teal);margin:6px 0 10px}
@@ -260,8 +261,9 @@ body{padding-bottom:0!important}
     <div class="cz-sum" id="czSum"></div>
     <form class="cz-form" id="czForm" novalidate>
       <label><span>Name <b class="req" aria-hidden="true">*</b></span><input type="text" name="name" autocomplete="name" required></label>
-      <label><span>Phone <b class="req" aria-hidden="true">*</b></span><input type="tel" name="phone" autocomplete="tel" required></label>
-      <label><span>Email <b class="req" aria-hidden="true">*</b></span><input type="email" name="email" autocomplete="email" required></label>
+      <label><span>Phone</span><input type="tel" name="phone" autocomplete="tel" aria-describedby="czReach"></label>
+      <label><span>Email</span><input type="email" name="email" autocomplete="email" aria-describedby="czReach"></label>
+      <p class="cz-reach full" id="czReach">Phone or email: at least one so we can reach you (both is best).</p>
       <label><span>ZIP code <b class="req" aria-hidden="true">*</b></span><input type="text" name="zip" id="czFZip" inputmode="numeric" autocomplete="postal-code" required></label>
       <label class="full">Timeline<select name="timeline"><option value="">Select…</option><option>ASAP</option><option>Within 3 months</option><option>3–6 months</option><option>6–12 months</option><option>Just planning ahead</option></select></label>
       <label class="full">Anything else we should know?<textarea name="notes" rows="3" placeholder="Concrete pad, gutters, insulation, anything else"></textarea></label>
@@ -335,10 +337,15 @@ var CZ={"zips":{"32003":["Orange Park",9],"32004":["Ponte Vedra Beach",57],"3200
     addEventListener('scroll', fix); ['wheel', 'touchstart', 'keydown', 'mousedown'].forEach(function (t) { addEventListener(t, mine, true); });
     setTimeout(off, 6100);
   }
+  // owner 10/16/26: the ZIP is optional and asked in the builder's step 1, which reports it here
+  function setLoc(z) {
+    zip = z; LOC = z ? lookup(z) : { ok: false };
+    try { if (z) localStorage.setItem('cz-zip', z); else localStorage.removeItem('cz-zip'); } catch (e) { }
+    renderLoc();
+  }
   function renderLoc() {
     var chip = $('czLoc'), warn = $('czWarn');
-    chip.innerHTML = '<span aria-hidden="true">📍</span> ' + (LOC.fl ? LOC.city + ', ' + LOC.county + ' County' : 'ZIP ' + zip + ' (outside Florida)') + ' <button type="button" id="czLocEdit">Change</button>';
-    $('czLocEdit').onclick = openGate;
+    chip.innerHTML = '<span aria-hidden="true">📍</span> ' + (!LOC.ok ? 'Add your ZIP in step 1 (optional)' : LOC.fl ? LOC.city + ', ' + LOC.county + ' County' : 'ZIP ' + zip + ' (outside Florida)');
     warn.className = 'cz-warn';
     if (LOC.nos) { warn.classList.add('stop'); warn.innerHTML = '⛔ We don’t currently build in ' + LOC.county + ' County. Call <a href="tel:5617715555">561-771-5555</a>.'; }
         else if (!LOC.fl) { warn.innerHTML = 'Outside Florida? We build along the East Coast too.'; }
@@ -355,6 +362,7 @@ var CZ={"zips":{"32003":["Orange Park",9],"32004":["Ponte Vedra Beach",57],"3200
     if (m.type === 'ss-design' && waiting && m.id === waiting.id) { var cb = waiting.cb; waiting = null; cb(m); }
     if (m.type === 'ss-open-quote' && !$('czSendBtn').disabled) openSend();
     if (m.type === 'ss-size' && m.w > 0 && m.l > 0 && m.h > 0) lastSize = { w: +m.w, l: +m.l, h: +m.h };
+    if (m.type === 'ss-location') setLoc(typeof m.zip === 'string' && /^\d{5}$/.test(m.zip) ? m.zip : '');
   });
   function post(msg) { try { frame.contentWindow.postMessage(msg, location.origin); } catch (e) { } }
   function requestDesign(cb) {
@@ -383,15 +391,18 @@ var CZ={"zips":{"32003":["Orange Park",9],"32004":["Ponte Vedra Beach",57],"3200
     e.preventDefault(); var f = e.target;
     var phone = f.phone.value.replace(/\D/g, '');
     if (!f.name.value.trim()) return fail('Please enter your name.', f.name);
-    if (phone.length < 10) return fail('Please enter a 10-digit phone number.', f.phone);
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(f.email.value.trim())) return fail('Please enter a valid email.', f.email);
+    var email = f.email.value.trim();
+    // owner 10/16/26: phone OR email (hopefully both)
+    if (!phone && !email) return fail('Please enter a phone number or an email so we can reach you.', f.phone);
+    if (phone && phone.length < 10) return fail('Please enter a 10-digit phone number.', f.phone);
+    if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return fail('Please enter a valid email.', f.email);
     if (!/^\d{5}$/.test(f.zip.value)) return fail('Please enter your 5-digit ZIP code.', f.zip);
     if (LOC.nos) return fail('We don’t currently build in ' + LOC.county + ' County. Call 561-771-5555.');
     if (f._gotcha.value) return;
     var d = new FormData(), spec = design && design.spec ? String(design.spec) : '(design not captured)';
     var link = design && design.state ? location.href.split('#')[0] + '#z=' + zip + '&d=' + b64e(design.state) : '';
     d.append('_subject', 'New quote request (3D design) · ' + (LOC.county ? LOC.county + ' County · ' : '') + f.name.value.trim());
-    d.append('name', f.name.value.trim()); d.append('phone', f.phone.value.trim()); d.append('email', f.email.value.trim()); d.append('_replyto', f.email.value.trim());
+    d.append('name', f.name.value.trim()); d.append('phone', f.phone.value.trim()); d.append('email', email); if (email) d.append('_replyto', email);
     d.append('zip', f.zip.value); d.append('county', LOC.county || (LOC.ok ? 'Outside Florida' : ''));    d.append('timeline', f.timeline.value); d.append('notes', f.notes.value.trim());
     d.append('design', spec); if (link) d.append('design_link (opens their exact 3D design)', link);
     var btn = $('czSubmit'); btn.disabled = true; btn.textContent = 'Sending…';
@@ -420,7 +431,8 @@ var CZ={"zips":{"32003":["Orange Park",9],"32004":["Ponte Vedra Beach",57],"3200
     // any other link opens in a new tab so this page (and the design) stays put
     try {
       var d = this.contentDocument, st = d.createElement('style');
-      st.textContent = 'nav.top,.mobile-menu,footer,.mob-cta,.rs-back{display:none!important}body{padding-bottom:0!important}';
+      // the planner's big intro is this window's title bar already: start at the tool
+      st.textContent = 'nav.top,.mobile-menu,footer,.mob-cta,.rs-back,.pl-hero{display:none!important}body{padding-bottom:0!important}.pl{padding-top:14px!important;margin-top:0!important}';
       d.head.appendChild(st);
       d.querySelectorAll('a[href]').forEach(function (a) { if (a.getAttribute('href').charAt(0) !== '#') a.target = '_blank'; });
     } catch (e) { }
@@ -444,7 +456,7 @@ var CZ={"zips":{"32003":["Orange Park",9],"32004":["Ponte Vedra Beach",57],"3200
   try { saved = localStorage.getItem('cz-zip') || ''; } catch (e) { }
   if (h) { try { pendingLoad = b64d(h[2]); } catch (e) { pendingLoad = null; } start(h[1]); }
   else if (saved && lookup(saved).ok) start(saved);
-  else openGate();
+  else { renderLoc(); ready = false; holdScroll(); frame.src = 'builder/index.html?'; } // no ZIP yet: the builder asks in step 1
 })();
 
 (function(){var els=document.querySelectorAll('.reveal');if(matchMedia('(prefers-reduced-motion: reduce)').matches||!('IntersectionObserver' in window)){els.forEach(function(e){e.classList.add('in');});return;}
