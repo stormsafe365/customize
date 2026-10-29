@@ -251,33 +251,7 @@ body{padding-bottom:0!important}
     <small>No prices, no sales pitch. Design your building, then send it to our team.</small>
   </form>
 </div>
-<div class="cz-send" id="czSend" hidden>
-  <div class="cz-card" role="dialog" aria-modal="true" aria-labelledby="czSendT">
-    <button type="button" class="cz-x" id="czClose" aria-label="Close">✕</button>
-    <h2 id="czSendT">Request your <span>free quote</span></h2>
-    <p>Send us your design and a <b style="color:var(--text)">StormSafe Steel Building Expert</b> will review it, confirm what your county requires, and contact you with your quote as soon as possible.</p>
-    <a class="btn btn-g cz-call" href="tel:5617715555">Prefer to talk? Call 561-771-5555</a>
-    <img class="cz-shot" id="czShot" alt="Your building design" hidden>
-    <div class="cz-sum" id="czSum"></div>
-    <form class="cz-form" id="czForm" novalidate>
-      <label><span>Name <b class="req" aria-hidden="true">*</b></span><input type="text" name="name" autocomplete="name" required></label>
-      <label><span>Phone <b class="req" aria-hidden="true">*</b></span><input type="tel" name="phone" autocomplete="tel" required></label>
-      <label><span>Email <b class="req" aria-hidden="true">*</b></span><input type="email" name="email" autocomplete="email" required></label>
-      <label><span>ZIP code <b class="req" aria-hidden="true">*</b></span><input type="text" name="zip" id="czFZip" inputmode="numeric" autocomplete="postal-code" required></label>
-      <label class="full">Timeline<select name="timeline"><option value="">Select…</option><option>ASAP</option><option>Within 3 months</option><option>3–6 months</option><option>6–12 months</option><option>Just planning ahead</option></select></label>
-      <label class="full">Anything else we should know?<textarea name="notes" rows="3" placeholder="Concrete pad, gutters, insulation, anything else"></textarea></label>
-      <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" style="position:absolute;left:-9999px" aria-hidden="true">
-      <p class="cz-err" id="czErr" role="alert"></p>
-      <button type="submit" class="btn btn-p cz-submit" id="czSubmit">Send my design &amp; request my quote →</button>
-      <p class="cz-fin">Financing available through HFS Financial. Ask us when we follow up.</p>
-    </form>
-    <div class="cz-done" id="czDone" tabindex="-1" hidden>
-      <div class="big">Design received.</div>
-      <p>Thanks! Our team will review your building and be in touch within one business day. Questions now? Call <a href="tel:5617715555">561-771-5555</a>.</p>
-      <button type="button" class="btn btn-g" id="czSave">⤓ Save a picture of my design</button>
-    </div>
-  </div>
-</div>
+<!-- the quote form lives in the builder's Review & send step (owner 10/29/26) -->
 </main>
 
 <script>
@@ -349,65 +323,50 @@ var CZ={"zips":{"32003":["Orange Park",9],"32004":["Ponte Vedra Beach",57],"3200
     if (LOC.nos) { warn.classList.add('stop'); warn.innerHTML = '⛔ We don’t currently build in ' + LOC.county + ' County. Call <a href="tel:5617715555">561-771-5555</a>.'; }
     else if (LOC.ok && !LOC.fl) { warn.innerHTML = 'Outside Florida? We build along the East Coast too.'; }
     else { warn.innerHTML = '✓ Engineered for your county’s wind code, certified up to 170 mph.'; }
-    $('czSendBtn').disabled = !!LOC.nos; $('czFZip').value = zip;
+    $('czSendBtn').disabled = !!LOC.nos;
   }
 
   /* ── talk to the builder ── */
-  var waiting = null, reqN = 0, ready = false, lastSize = null;
+  var ready = false, lastSize = null;
   addEventListener('message', function (e) {
     if (e.source !== frame.contentWindow || e.origin !== location.origin || !e.data || typeof e.data !== 'object') return;
     var m = e.data;
     if (m.type === 'ss-ready') { ready = true; $('czFrameWrap').classList.add('ready'); if (pendingLoad) { var st = pendingLoad; pendingLoad = null; post({ type: 'ss-load-design', id: 'reopen', state: st }); } }
-    if (m.type === 'ss-design' && waiting && m.id === waiting.id) { var cb = waiting.cb; waiting = null; cb(m); }
-    if (m.type === 'ss-open-quote' && !$('czSendBtn').disabled) openSend();
+    if (m.type === 'ss-send') sendFromBuilder(m);
     if (m.type === 'ss-size' && m.w > 0 && m.l > 0 && m.h > 0) lastSize = { w: +m.w, l: +m.l, h: +m.h };
     if (m.type === 'ss-location') setLoc(typeof m.zip === 'string' && /^\d{5}$/.test(m.zip) ? m.zip : '');
   });
   function post(msg) { try { frame.contentWindow.postMessage(msg, location.origin); } catch (e) { } }
-  function requestDesign(cb) {
-    var done = false, t = setTimeout(function () { if (!done) { done = true; waiting = null; cb(null); } }, 20000); // the picture takes 1-3 s on desktop, longer on phones
-    var id = 'req-' + (++reqN); waiting = { id: id, cb: function (d) { if (done) return; done = true; clearTimeout(t); cb(d); } };
-    post({ type: 'ss-request-design', id: id });
-  }
   frame.addEventListener('load', function () { $('czFrameWrap').classList.add('ready'); });
 
-  /* ── send ── */
-  function openSend() {
-    var btn = $('czSendBtn'); btn.disabled = true; btn.textContent = 'Getting your design…';
-    requestDesign(function (d) {
-      btn.disabled = !!LOC.nos; btn.innerHTML = 'Get my<span class="cz-lg"> free</span> quote →';
-      design = d;
-      $('czShot').hidden = !(d && d.image); if (d && d.image) $('czShot').src = d.image;
-      var spec = (d && d.spec) ? String(d.spec) : '';
-      $('czSum').textContent = spec || 'We couldn’t read the design from the builder. Send anyway and add details in the notes, or call 561-771-5555.';
-      $('czSend').hidden = false; $('czDone').hidden = true; $('czForm').hidden = false; $('czErr').textContent = '';
-      setTimeout(function () { $('czSend').querySelector('input[name=name]').focus(); }, 30);
-    });
-  }
-  function closeSend() { $('czSend').hidden = true; $('czSendBtn').focus(); }
-  function fail(m, el) { $('czErr').textContent = m; if (el) el.focus(); }
-  function submit(e) {
-    e.preventDefault(); var f = e.target;
-    var phone = f.phone.value.replace(/\D/g, '').replace(/^1(?=\d{10}$)/, ''), name = f.name.value.trim(), email = f.email.value.trim();
-    // owner 10/19/26: name, phone, email and ZIP are all required
-    if (!name) return fail('Please enter your name.', f.name);
-    if (/[<>"`]/.test(name)) return fail('Please use letters only in your name (no < > " or ` marks).', f.name);
-    if (phone.length !== 10) return fail('Please enter your 10-digit phone number.', f.phone);
-    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return fail('Please enter a valid email.', f.email);
-    if (!/^\d{5}$/.test(f.zip.value)) return fail('Please enter your 5-digit ZIP code.', f.zip);
-    if (LOC.nos) return fail('We don’t currently build in ' + LOC.county + ' County. Call 561-771-5555.');
-    if (f._gotcha.value) return;
-    var d = new FormData(), spec = design && design.spec ? String(design.spec) : '(design not captured)';
-    var link = design && design.state ? location.href.split('#')[0] + '#z=' + zip + '&d=' + b64e(design.state) : '';
-    d.append('_subject', 'New quote request (3D design) · ' + (LOC.county ? LOC.county + ' County · ' : '') + f.name.value.trim());
-    d.append('name', f.name.value.trim()); d.append('phone', f.phone.value.trim()); d.append('email', email); if (email) d.append('_replyto', email);
-    d.append('zip', f.zip.value); d.append('county', LOC.county || (LOC.ok ? 'Outside Florida' : ''));    d.append('timeline', f.timeline.value); d.append('notes', f.notes.value.trim());
+  /* ── send (owner 10/29/26): the builder's own Review & send step (like the design link) collects the details
+     and hands the design over (ss-send). This page sends the Formspree email to the team exactly as before, then
+     the CRM copy, and answers the builder (ss-sent). Same rules as the builder: name, phone, email and ZIP. ── */
+  function sendFromBuilder(m) {
+    var reply = function (ok, error) { post({ type: 'ss-sent', ok: ok, error: error }); };
+    var c = m.contact && typeof m.contact === 'object' ? m.contact : {};
+    var s = function (v) { return typeof v === 'string' ? v.trim() : ''; };
+    var name = s(c.name), email = s(c.email), z = s(c.zip), notes = s(c.notes).slice(0, 2000), timeline = s(m.timeline).slice(0, 60);
+    var phone = s(c.phone).replace(/\D/g, '').replace(/^1(?=\d{10}$)/, '');
+    if (!name || /[<>"`]/.test(name)) return reply(false, 'bad_name');
+    if (phone.length !== 10) return reply(false, 'bad_phone');
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return reply(false, 'bad_email');
+    if (!/^\d{5}$/.test(z)) return reply(false, 'need_zip');
+    if (s(c.website)) return reply(true); // honeypot filled = a bot: nothing goes out
+    var L = lookup(z);
+    if (L.nos) return reply(false, 'no_service');
+    design = { state: m.state && typeof m.state === 'object' ? m.state : null, spec: typeof m.spec === 'string' ? m.spec : '', image: typeof m.image === 'string' ? m.image : null };
+    var d = new FormData(), spec = design.spec || '(design not captured)';
+    var link = design.state ? location.href.split('#')[0] + '#z=' + z + '&d=' + b64e(design.state) : '';
+    d.append('_subject', 'New quote request (3D design) · ' + (L.county ? L.county + ' County · ' : '') + name);
+    d.append('name', name); d.append('phone', s(c.phone)); d.append('email', email); d.append('_replyto', email);
+    d.append('zip', z); d.append('county', L.county || (L.ok ? 'Outside Florida' : '')); d.append('timeline', timeline); d.append('notes', notes);
     d.append('design', spec); if (link) d.append('design_link (opens their exact 3D design)', link);
-    var btn = $('czSubmit'); btn.disabled = true; btn.textContent = 'Sending…';
     fetch(CZ.endpoint, { method: 'POST', body: d, headers: { Accept: 'application/json' } }).then(function (r) {
-      if (!r.ok) throw 0; $('czForm').hidden = true; $('czDone').hidden = false; $('czDone').focus();
-      sendToCrm({ name: name, phone: phone, email: email, zip: f.zip.value, timeline: f.timeline.value, notes: f.notes.value.trim() });
-    }).catch(function () { fail('Something went wrong sending your design. Please call 561-771-5555 or try again.'); }).then(function () { btn.disabled = false; btn.textContent = 'Send my design & request my quote →'; });
+      if (!r.ok) throw 0;
+      reply(true);
+      sendToCrm({ name: name, phone: phone, email: email, zip: z, timeline: timeline, notes: notes });
+    }).catch(function () { reply(false, 'send_failed'); });
   }
   /* ── CRM copy (owner 10/19/26): after the email went out, the same design goes to Customer Designs ("From: Website").
      Best effort only: a failure is logged and never shown to the visitor. ── */
@@ -428,7 +387,6 @@ var CZ={"zips":{"32003":["Orange Park",9],"32004":["Ponte Vedra Beach",57],"3200
         .catch(function (err) { console.log('CRM copy not sent:', err); });
     } catch (err) { console.log('CRM copy failed:', err); }
   }
-  function saveImage() { if (!design || !design.image) return; var a = document.createElement('a'); a.href = design.image; a.download = 'my-stormsafe-design.' + (/^data:image\/png/.test(design.image) ? 'png' : 'jpg'); document.body.appendChild(a); a.click(); a.remove(); }
 
   /* ── "See what fits inside": the size planner opens OVER the builder (no navigation = the design is never lost) ── */
   var fitSrc = '';
@@ -462,13 +420,8 @@ var CZ={"zips":{"32003":["Orange Park",9],"32004":["Ponte Vedra Beach",57],"3200
   /* ── wire + boot ── */
   $('czZip').addEventListener('input', function () { this.value = this.value.replace(/\D/g, '').slice(0, 5); gateMsg(); });
   $('czGateF').addEventListener('submit', function (e) { e.preventDefault(); start($('czZip').value.trim()); });
-  $('czSendBtn').addEventListener('click', openSend);
-  $('czClose').addEventListener('click', closeSend);
-  $('czSend').addEventListener('click', function (e) { if (e.target === this) closeSend(); });
-  addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('czSend').hidden) closeSend(); });
-  $('czForm').addEventListener('submit', submit);
-  $('czFZip').addEventListener('input', function () { this.value = this.value.replace(/\D/g, '').slice(0, 5); });
-  $('czSave').addEventListener('click', saveImage);
+  // "Get my free quote": the builder's Review & send step (its own form, like the design link)
+  $('czSendBtn').addEventListener('click', function () { if ($('czFitWin') && !$('czFitWin').hidden) closeFit(); post({ type: 'ss-goto', tab: 'send' }); frame.focus(); });
 
   var h = /#z=(\d{5})&d=([\w-]+)/.exec(location.hash), saved = '';
   try { saved = localStorage.getItem('cz-zip') || ''; } catch (e) { }
