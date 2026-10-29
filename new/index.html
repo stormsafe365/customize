@@ -238,7 +238,7 @@ body{padding-bottom:0!important}
   <h1>Design Your Building</h1>
   <div class="cz-loc" id="czLoc"></div>
   <div class="cz-warn" id="czWarn" role="status"></div>
-  <div class="cz-right"><button type="button" class="btn cz-fit" id="czFitBtn"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 7h18v10H3zM7 7v4M11 7v6M15 7v4M19 7v4" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>See what fits<span class="cz-lg"> inside</span></button><button type="button" class="btn btn-p" id="czSendBtn">Get my<span class="cz-lg"> free</span> quote →</button></div>
+  <div class="cz-right"><button type="button" class="btn btn-p" id="czSendBtn">Get my<span class="cz-lg"> free</span> quote →</button></div>
 </div>
 <div class="cz-frame" id="czFrameWrap">
   <div class="cz-wait">Loading the 3D builder…</div>
@@ -342,6 +342,7 @@ var CZ={"zips":{"32003":["Orange Park",9],"32004":["Ponte Vedra Beach",57],"3200
     var m = e.data;
     if (m.type === 'ss-ready') { ready = true; $('czFrameWrap').classList.add('ready'); if (pendingLoad) { var st = pendingLoad; pendingLoad = null; post({ type: 'ss-load-design', id: 'reopen', state: st }); } }
     if (m.type === 'ss-send') sendFromBuilder(m);
+    if (m.type === 'ss-open-fit') openFit(); // the button in the 3D box (owner 10/29/26)
     if (m.type === 'ss-size' && m.w > 0 && m.l > 0 && m.h > 0) lastSize = { w: +m.w, l: +m.l, h: +m.h };
     if (m.type === 'ss-location') setLoc(typeof m.zip === 'string' && /^\d{5}$/.test(m.zip) ? m.zip : '');
   });
@@ -410,7 +411,7 @@ var CZ={"zips":{"32003":["Orange Park",9],"32004":["Ponte Vedra Beach",57],"3200
     if (src !== fitSrc) { fitSrc = src; $('czFitFrame').src = src; }
     $('czFitWin').hidden = false; $('czFitBack').focus();
   }
-  function closeFit() { $('czFitWin').hidden = true; $('czFitBtn').focus(); }
+  function closeFit() { $('czFitWin').hidden = true; frame.focus(); }
   $('czFitFrame').addEventListener('load', function () {
     // inside this window the planner is a tool, not a page: hide its site menus and "All Resources" link;
     // any other link opens in a new tab so this page (and the design) stays put
@@ -422,7 +423,6 @@ var CZ={"zips":{"32003":["Orange Park",9],"32004":["Ponte Vedra Beach",57],"3200
       d.querySelectorAll('a[href]').forEach(function (a) { if (a.getAttribute('href').charAt(0) !== '#') a.target = '_blank'; });
     } catch (e) { }
   });
-  $('czFitBtn').addEventListener('click', openFit);
   $('czFitBack').addEventListener('click', closeFit);
   addEventListener('keydown', function (e) { if (e.key === 'Escape' && !$('czFitWin').hidden) closeFit(); });
 
