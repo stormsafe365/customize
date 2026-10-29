@@ -318,7 +318,7 @@ var CZ={"zips":{"32003":["Orange Park",9],"32004":["Ponte Vedra Beach",57],"3200
   }
   function renderLoc() {
     var chip = $('czLoc'), warn = $('czWarn');
-    chip.innerHTML = '<span aria-hidden="true">📍</span> ' + (!LOC.ok ? 'Add your ZIP in step 1 (optional)' : LOC.fl ? LOC.city + ', ' + LOC.county + ' County' : 'ZIP ' + zip + ' (outside Florida)');
+    chip.innerHTML = '<span aria-hidden="true">📍</span> ' + (!LOC.ok ? 'Add your ZIP in step 1' : LOC.fl ? LOC.city + ', ' + LOC.county + ' County' : 'ZIP ' + zip + ' (outside Florida)');
     warn.className = 'cz-warn';
     if (LOC.nos) { warn.classList.add('stop'); warn.innerHTML = '⛔ We don’t currently build in ' + LOC.county + ' County. Call <a href="tel:5617715555">561-771-5555</a>.'; }
     else if (LOC.ok && !LOC.fl) { warn.innerHTML = 'Outside Florida? We build along the East Coast too.'; }
