@@ -200,6 +200,10 @@ body:not(:has(nav.top)) .cz{height:100vh;min-height:0}
  .cz-lg{display:none}.cz-right{gap:8px;flex:none}.cz-right .btn{min-height:38px;padding:8px 10px;font-size:10.5px;letter-spacing:.06em}.cz-fit svg{width:16px;height:16px}
  .cz-form{grid-template-columns:1fr}.cz-gate form,.cz-card{padding:20px 16px}
 }
+/* a phone-width box (Wix mobile ~280-360px, owner 10/30/26): the bar never runs past the edge */
+html,body{overflow-x:hidden}
+@media(max-width:380px){.cz-bar{padding:8px 10px}.cz-right .btn{padding:8px 9px;font-size:10px;letter-spacing:.04em}.cz-loc{font-size:11.5px}}
+@media(max-width:300px){.cz-loc{display:none}.cz-right{margin-left:0;flex:1}.cz-right .btn{width:100%}}
 
 /* Wix embed */
 body{padding-bottom:0!important}
