@@ -202,6 +202,8 @@ body:not(:has(nav.top)) .cz{height:100vh;min-height:0}
 }
 /* a phone-width box (Wix mobile ~280-360px, owner 10/30/26): the bar never runs past the edge */
 html,body{overflow-x:hidden}
+/* the bar can never widen the page (owner 10/30/26: a long place name — Boynton Beach, Palm Beach County — pushed the bar to 356px in a 320px Wix box and the builder under it got cut off) */
+.cz{grid-template-columns:minmax(0,1fr)}.cz-bar,.cz-frame{min-width:0}.cz-loc{min-width:0}
 @media(max-width:380px){.cz-bar{padding:8px 10px}.cz-right .btn{padding:8px 9px;font-size:10px;letter-spacing:.04em}.cz-loc{font-size:11.5px}}
 @media(max-width:300px){.cz-loc{display:none}.cz-right{margin-left:0;flex:1}.cz-right .btn{width:100%}}
 
@@ -214,6 +216,8 @@ body{padding-bottom:0!important}
 
 /* Wix embed: no site menu; fill the window, up to 940px (a taller Wix window just gets dark space below) */
 .cz{height:min(100vh,940px)!important;min-height:520px!important}
+/* a phone-width box: up to 760px tall (Wix mobile boxes can be thousands of px tall) */
+@media(max-width:899px){.cz{height:min(100vh,760px)!important;min-height:480px!important}}
 </style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <style id="nav-res-css">
