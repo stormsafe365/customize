@@ -191,6 +191,23 @@ body:not(:has(nav.top)) .cz{height:100vh;min-height:0}
 .cz-submit{grid-column:1/-1;width:100%}
 .cz-done{text-align:center;padding:10px 4px}.cz-done:focus{outline:none}.cz-done .big{font:900 22px/1.15 var(--h);text-transform:uppercase;color:var(--teal);margin:6px 0 10px}
 .cz-done p{color:var(--sub);font-size:14px;line-height:1.6;margin-bottom:14px}.cz-done a{color:var(--teal)}
+/* Phones inside the website (owner 10/31/26): a card, not the builder. The Wix mobile box is 320 x 866 and
+   the builder needs more room than that, so tapping opens it full screen instead of nesting two scrollbars. */
+.cz.cz-card{height:auto!important;min-height:100vh!important;grid-template-rows:auto}
+.cz.cz-card .cz-bar,.cz.cz-card .cz-frame{display:none}
+.cz-phone{display:none;padding:26px 18px 30px;background:var(--dark)}
+.cz.cz-card .cz-phone{display:block}
+.cz-phone .ek{font:700 11px/1 var(--h);letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
+.cz-phone h2{font:900 27px/1.1 var(--h);text-transform:uppercase;letter-spacing:.01em;margin:0 0 12px;color:var(--text)}
+.cz-phone h2 span{color:var(--teal);display:block}
+.cz-phone p{font-size:14.5px;line-height:1.6;color:var(--sub);margin:0 0 20px}
+.cz-phone .btn{width:100%;min-height:52px;font-size:13px}
+.cz-phone small{display:block;margin-top:11px;font-size:12px;color:var(--muted);text-align:center}
+.cz-phone-call{display:block;margin-top:18px;padding-top:16px;border-top:1px solid var(--border);text-align:center;font-size:14px;font-weight:600;color:var(--teal);text-decoration:none}
+.cz-steps{list-style:none;margin:0 0 22px;padding:0;display:grid;gap:9px}
+.cz-steps li{display:flex;gap:10px;align-items:center;font-size:13.5px;color:var(--sub)}
+.cz-steps b{flex:none;width:23px;height:23px;border-radius:6px;background:var(--dark-3);border:1px solid var(--border-vis);color:var(--teal);font:800 11px/23px var(--h);text-align:center}
+@media(max-width:360px){.cz-phone h2{font-size:23px}.cz-phone{padding:22px 14px 26px}}
 @media(max-width:899px){
  .cz{height:calc(100vh - 56px);min-height:560px}
  .cz-bar{padding:8px 12px;gap:6px 10px}
@@ -216,8 +233,8 @@ body{padding-bottom:0!important}
 
 /* Wix embed: no site menu; fill the window, up to 940px (a taller Wix window just gets dark space below) */
 .cz{height:min(100vh,940px)!important;min-height:520px!important}
-/* a phone-width box (owner 10/30/26: 760 was "soooo compacted"): up to 1500px tall, so the options have room and the website scrolls instead of a small box */
-@media(max-width:899px){.cz{height:min(100vh,1500px)!important;min-height:480px!important}}
+/* a phone-width box: the card sizes itself (.cz-card) — on a phone the builder opens full screen instead (owner 10/31/26) */
+@media(max-width:899px){.cz:not(.cz-card){height:100vh!important;min-height:420px!important}}
 </style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <style id="nav-res-css">
@@ -247,6 +264,19 @@ body{padding-bottom:0!important}
   <div class="cz-loc" id="czLoc"></div>
   <div class="cz-warn" id="czWarn" role="status"></div>
   <div class="cz-right"><button type="button" class="btn btn-p" id="czSendBtn">Get my<span class="cz-lg"> free</span> quote →</button></div>
+</div>
+<div class="cz-phone camo" id="czPhone" hidden>
+  <div class="ek">Hurricane-Rated · Florida</div>
+  <h2>Design Your<span>Building In 3D.</span></h2>
+  <p>Set your size, roof, doors, lean-tos and colors, then send it to our team for a free quote and a 3D rendering of your actual building.</p>
+  <ol class="cz-steps">
+    <li><b>1</b> Your ZIP sets your county's wind code</li>
+    <li><b>2</b> Build it on screen, about 60 seconds</li>
+    <li><b>3</b> Send it over — no prices, no sales pitch</li>
+  </ol>
+  <a class="btn btn-p" id="czPhoneGo" href="#" target="_blank" rel="noopener">Start designing →</a>
+  <small>Opens full screen, so you have room to work.</small>
+  <a class="cz-phone-call" href="tel:+15617715555">Or call 561-771-5555</a>
 </div>
 <div class="cz-frame" id="czFrameWrap">
   <div class="cz-wait">Loading the 3D builder…</div>
@@ -439,6 +469,17 @@ var CZ={"zips":{"32003":["Orange Park",9],"32004":["Ponte Vedra Beach",57],"3200
   $('czGateF').addEventListener('submit', function (e) { e.preventDefault(); start($('czZip').value.trim()); });
   // "Get my free quote": the builder's Review & send step (its own form, like the design link)
   $('czSendBtn').addEventListener('click', function () { if ($('czFitWin') && !$('czFitWin').hidden) closeFit(); post({ type: 'ss-goto', tab: 'send' }); frame.focus(); });
+
+  /* Phones INSIDE the website (owner 10/31/26): the Wix mobile box is 320 x 866 and Wix lays the mobile page
+     out at a 320px design width, so the builder's options never fit — every step had its own scrollbar. A phone
+     gets the card instead, and the builder opens FULL SCREEN (this same page, top level) on tap. Its own page,
+     tablets and desktop are unchanged. */
+  if (parent !== window && innerWidth < 760) {
+    $('czMain').classList.add('cz-card');
+    $('czPhone').hidden = false;
+    $('czPhoneGo').href = location.href.split('#')[0] + location.hash; // a saved design reopens full screen too
+    return;
+  }
 
   var h = /#z=(\d{5})&d=([\w-]+)/.exec(location.hash), saved = '';
   try { saved = localStorage.getItem('cz-zip') || ''; } catch (e) { }
