@@ -193,10 +193,10 @@ body:not(:has(nav.top)) .cz{height:100vh;min-height:0}
 .cz-done p{color:var(--sub);font-size:14px;line-height:1.6;margin-bottom:14px}.cz-done a{color:var(--teal)}
 /* Phones inside the website (owner 10/31/26): a card, not the builder. The Wix mobile box is 320 x 866 and
    the builder needs more room than that, so tapping opens it full screen instead of nesting two scrollbars. */
-.cz.cz-card{height:auto!important;min-height:100vh!important;grid-template-rows:auto}
-.cz.cz-card .cz-bar,.cz.cz-card .cz-frame{display:none}
+.cz.cz-phonemode{height:auto!important;min-height:100vh!important;grid-template-rows:auto}
+.cz.cz-phonemode .cz-bar,.cz.cz-phonemode .cz-frame{display:none}
 .cz-phone{display:none;padding:26px 18px 30px;background:var(--dark)}
-.cz.cz-card .cz-phone{display:block}
+.cz.cz-phonemode .cz-phone{display:block}
 .cz-phone .ek{font:700 11px/1 var(--h);letter-spacing:.14em;text-transform:uppercase;color:var(--teal);margin-bottom:12px}
 .cz-phone h2{font:900 27px/1.1 var(--h);text-transform:uppercase;letter-spacing:.01em;margin:0 0 12px;color:var(--text)}
 .cz-phone h2 span{color:var(--teal);display:block}
@@ -233,8 +233,8 @@ body{padding-bottom:0!important}
 
 /* Wix embed: no site menu; fill the window, up to 940px (a taller Wix window just gets dark space below) */
 .cz{height:min(100vh,940px)!important;min-height:520px!important}
-/* a phone-width box: the card sizes itself (.cz-card) — on a phone the builder opens full screen instead (owner 10/31/26) */
-@media(max-width:899px){.cz:not(.cz-card){height:100vh!important;min-height:420px!important}}
+/* a phone-width box: the card sizes itself (.cz-phonemode) — on a phone the builder opens full screen instead (owner 10/31/26) */
+@media(max-width:899px){.cz:not(.cz-phonemode){height:100vh!important;min-height:420px!important}}
 </style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <style id="nav-res-css">
@@ -475,7 +475,7 @@ var CZ={"zips":{"32003":["Orange Park",9],"32004":["Ponte Vedra Beach",57],"3200
      gets the card instead, and the builder opens FULL SCREEN (this same page, top level) on tap. Its own page,
      tablets and desktop are unchanged. */
   if (parent !== window && innerWidth < 760) {
-    $('czMain').classList.add('cz-card');
+    $('czMain').classList.add('cz-phonemode');
     $('czPhone').hidden = false;
     $('czPhoneGo').href = location.href.split('#')[0] + location.hash; // a saved design reopens full screen too
     return;
