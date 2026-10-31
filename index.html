@@ -139,7 +139,8 @@ footer{background:var(--dark-2);border-top:1px solid var(--border-vis);padding:4
 
 .mob-cta{display:none!important}body{padding-bottom:0!important}.cz [hidden]{display:none!important}
 .cz{position:relative;display:grid;grid-template-rows:auto minmax(0,1fr);height:calc(100vh - 60px);min-height:620px;background:var(--dark)}
-body:not(:has(nav.top)) .cz{height:100vh;min-height:0}
+body:not(:has(nav.top)) .cz{height:calc(100vh - var(--sitebar,0px));min-height:0}
+body.cz-full{--sitebar:46px}
 .cz-bar{display:flex;align-items:center;gap:14px 18px;flex-wrap:wrap;padding:10px 18px;background:var(--dark-2);border-bottom:1px solid var(--border-vis)}
 .cz-bar h1{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap} /* the builder shows its own title */
 .cz-loc{font-size:13px;color:var(--sub);display:flex;gap:6px;align-items:center}
@@ -193,6 +194,20 @@ body:not(:has(nav.top)) .cz{height:100vh;min-height:0}
 .cz-done p{color:var(--sub);font-size:14px;line-height:1.6;margin-bottom:14px}.cz-done a{color:var(--teal)}
 /* Phones inside the website (owner 10/31/26): a card, not the builder. The Wix mobile box is 320 x 866 and
    the builder needs more room than that, so tapping opens it full screen instead of nesting two scrollbars. */
+/* Full screen (the card's "Start designing" opens this page top level, with no Wix menu around it).
+   Owner 10/31/26: "you loose the three bars at the top right for the menu of the site - which i dont love".
+   So the full-screen page carries its own slim site bar: wordmark back to the site, and the same menu. */
+.cz-topnav[hidden],.cz-menu[hidden]{display:none}
+.cz-topnav{position:relative;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:12px;height:46px;padding:0 14px;background:#08121d;border-bottom:1px solid #1f2e44}
+.cz-wm{font:800 14px/1 var(--h);letter-spacing:.04em;text-transform:uppercase;color:var(--text);text-decoration:none;white-space:nowrap}
+.cz-wm span{color:var(--teal)}
+.cz-burger{display:flex;flex-direction:column;justify-content:center;gap:4px;width:40px;height:34px;padding:0 9px;background:none;border:0;cursor:pointer}
+.cz-burger i{display:block;height:2px;border-radius:2px;background:var(--text)}
+.cz-burger[aria-expanded=true] i{background:var(--teal)}
+.cz-menu{position:absolute;top:46px;right:0;left:0;z-index:29;background:#0b1826;border-bottom:1px solid #1f2e44;box-shadow:0 20px 50px rgba(0,0,0,.55);padding:6px 0 10px}
+.cz-menu a{display:block;padding:11px 18px;font-size:14.5px;font-weight:600;color:var(--text);text-decoration:none;border-bottom:1px solid rgba(31,46,68,.6)}
+.cz-menu a:last-child{border-bottom:0;margin-top:8px;color:#08121d;background:var(--teal);text-align:center;border-radius:8px;width:calc(100% - 28px);margin-left:14px;padding:13px 10px}
+.cz-menu a.on{color:var(--teal)}
 .cz.cz-phonemode{height:auto!important;min-height:100vh!important;grid-template-rows:auto}
 .cz.cz-phonemode .cz-bar,.cz.cz-phonemode .cz-frame{display:none}
 .cz-phone{display:none;padding:26px 18px 30px;background:var(--dark)}
@@ -234,7 +249,7 @@ body{padding-bottom:0!important}
 /* Wix embed: no site menu; fill the window, up to 940px (a taller Wix window just gets dark space below) */
 .cz{height:min(100vh,940px)!important;min-height:520px!important}
 /* a phone-width box: the card sizes itself (.cz-phonemode) — on a phone the builder opens full screen instead (owner 10/31/26) */
-@media(max-width:899px){.cz:not(.cz-phonemode){height:100vh!important;min-height:420px!important}}
+@media(max-width:899px){.cz:not(.cz-phonemode){height:calc(100vh - var(--sitebar,0px))!important;min-height:420px!important}}
 </style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
 <style id="nav-res-css">
@@ -258,6 +273,22 @@ body{padding-bottom:0!important}
 </head>
 <body>
 
+<header class="cz-topnav" id="czNav" hidden>
+  <a class="cz-wm" href="https://www.stormsafesteel.com/" target="_parent">Storm<span>Safe</span> Steel</a>
+  <button type="button" class="cz-burger" id="czBurger" aria-label="Site menu" aria-expanded="false" aria-controls="czMenu"><i></i><i></i><i></i></button>
+  <nav class="cz-menu" id="czMenu" hidden>
+    <a href="https://www.stormsafesteel.com/" target="_parent">Home</a>
+    <a href="https://www.stormsafesteel.com/buildings" target="_parent">Buildings</a>
+    <a class="on" href="#" id="czMenuHere">Design Your Building</a>
+    <a href="https://www.stormsafesteel.com/hurricane-rated-steel-buildings" target="_parent">Hurricane-Rated</a>
+    <a href="https://www.stormsafesteel.com/custom-steel-buildings" target="_parent">Custom Builds</a>
+    <a href="https://www.stormsafesteel.com/why-steel" target="_parent">Why Steel</a>
+    <a href="https://www.stormsafesteel.com/about-us" target="_parent">About</a>
+    <a href="https://www.stormsafesteel.com/blog" target="_parent">Blog</a>
+    <a href="https://www.stormsafesteel.com/contact" target="_parent">Contact</a>
+    <a href="tel:+15617715555">Call 561-771-5555</a>
+  </nav>
+</header>
 <main class="cz" id="czMain">
 <div class="cz-bar">
   <h1>Design Your Building</h1>
@@ -469,6 +500,22 @@ var CZ={"zips":{"32003":["Orange Park",9],"32004":["Ponte Vedra Beach",57],"3200
   $('czGateF').addEventListener('submit', function (e) { e.preventDefault(); start($('czZip').value.trim()); });
   // "Get my free quote": the builder's Review & send step (its own form, like the design link)
   $('czSendBtn').addEventListener('click', function () { if ($('czFitWin') && !$('czFitWin').hidden) closeFit(); post({ type: 'ss-goto', tab: 'send' }); frame.focus(); });
+
+  /* Opened FULL SCREEN from the card (top level, and this page carries no site menu of its own):
+     show a slim site bar so the menu is still there (owner 10/31/26: "you loose the three bars at the
+     top right for the menu of the site"). Inside a frame, and on the real site page (which has nav.top),
+     nothing changes. */
+  if (parent === window && !document.querySelector('nav.top') && $('czNav')) {
+    document.body.classList.add('cz-full');
+    $('czNav').hidden = false;
+    $('czMenuHere').href = location.href.split('#')[0];
+    var burger = $('czBurger'), menu = $('czMenu');
+    var setMenu = function (open) { menu.hidden = !open; burger.setAttribute('aria-expanded', open ? 'true' : 'false'); };
+    burger.addEventListener('click', function () { setMenu(menu.hidden); });
+    $('czMenuHere').addEventListener('click', function (e) { e.preventDefault(); setMenu(false); });
+    addEventListener('keydown', function (e) { if (e.key === 'Escape' && !menu.hidden) { setMenu(false); burger.focus(); } });
+    document.addEventListener('click', function (e) { if (!menu.hidden && !menu.contains(e.target) && e.target !== burger && !burger.contains(e.target)) setMenu(false); });
+  }
 
   /* Phones INSIDE the website (owner 10/31/26): the Wix mobile box is 320 x 866 and Wix lays the mobile page
      out at a 320px design width, so the builder's options never fit — every step had its own scrollbar. A phone
